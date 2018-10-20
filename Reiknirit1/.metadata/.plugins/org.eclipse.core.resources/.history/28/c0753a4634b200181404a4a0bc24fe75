@@ -1,0 +1,173 @@
+package S1;
+
+import edu.princeton.cs.algs4.QuickFindUF;
+
+public class Percolation {
+	
+		private boolean[][] grid;
+		private int size;					//The grid will be size*size
+		private int count;					//counting the open sites
+		private QuickFindUF uf;
+		private QuickFindUF bfuf;
+		private int top,bottom;				//top and bottom node to check if the grid percolates.
+		
+		//quickfindUF
+	
+		//create N-by-N grid, with all sites initially blocked
+		public Percolation(int N) 
+		{
+			//if N is illegal exception
+			if (N <= 0) 
+			{
+	            throw new java.lang.IllegalArgumentException();
+			}
+		
+			bfuf = new QuickFindUF(N * N + 1);
+			uf = new QuickFindUF(N * N + 2);
+			
+			size = N;
+	        grid = new boolean[N][N];
+	        
+	        top = N * N;
+	        bottom = N * N + 1;
+	        
+		}
+		
+		//open the site (row, col) if it is not open already
+		public void open(int row, int col) 
+		{
+			// if index is out of bounds, throw exceptions
+			if(row < 0 || row >= size || col < 0 || col >= size) 
+			{
+				throw new java.lang.IndexOutOfBoundsException();
+			}
+			
+			if(grid[row][col] == false) 
+			{
+				grid[row][col] = true;
+				
+				//is the element to the left open?
+				if(col > 0 && isOpen(row, col - 1))    
+				{
+					uf.union(row * size + col, row * size + (col - 1));
+					bfuf.union(row * size + col, row * size + (col - 1));
+				}
+				
+				//is the element to the right open?
+				if(col < (size - 1) && isOpen(row, (col + 1)))
+				{
+					uf.union(row * size + col, row * size + (col + 1));
+					bfuf.union(row * size + col, row * size + (col + 1));
+				}
+				
+				//is the element on top open?
+				if(row > 0 && isOpen(row - 1, col))
+				{
+					uf.union(row * size + col, (row-1) * size + col);
+					bfuf.union(row * size + col, (row-1) * size + col);
+				}
+				
+				//is the element on bottom open?
+				if(row < (size - 1) && isOpen(row + 1, col))
+				{
+					uf.union(row * size + col, (row+1) * size + col);
+					bfuf.union(row * size + col, (row+1) * size + col);
+				}
+				
+				//connect the top row to the top node
+				if(row == 0)
+				{
+					uf.union(row * size + col, top);
+					bfuf.union(row * size + col, top);
+				}
+				
+				//connect the bottom row to the bottom node;
+				if(row == size - 1)
+				{
+					uf.union(row * size + col, bottom);
+				}
+				count++;
+			}	
+		}
+		
+		//is the site (row, col) open?
+		public boolean isOpen(int row, int col) 
+		{
+			// if index is out of bounds, throw exceptions
+			if(row < 0 || row >= size || col < 0 || col >= size) 
+			{
+				throw new java.lang.IndexOutOfBoundsException();
+			}
+			return grid[row][col];
+		}
+		
+		//is the site(row, col) full?
+		public boolean isFull(int row, int col) 
+		{
+			// if index is out of bounds, throw exceptions
+			if(row < 0 || row >= size || col < 0 || col >= size) 
+			{
+				throw new java.lang.IndexOutOfBoundsException();
+			}
+			
+			if(bfuf.connected(row *  size + col, top))
+			{
+					return true;
+			}
+
+			return false;
+		}
+		
+		//number of open sites
+		public int numberOfOpenSites() 
+		{
+			return count;
+		}
+		
+		//does the system percolate
+		public boolean percolates() 
+		{
+			if(uf.connected(bottom, top)) //if the bottom and top connects, it perclates
+			{
+				return true;
+			}
+			return false;
+		}
+		
+		//unit testing
+		public static void main(String[] args) {
+			Percolation newgrid = new Percolation(4);
+			newgrid.open(2,0);
+			System.out.println("opening (2, 0)");
+			newgrid.open(0,3);
+			System.out.println("opening (0, 3)");
+			newgrid.open(1,2);
+			System.out.println("opening (1, 2)");
+			newgrid.open(2,2);
+			System.out.println("opening (2, 2)");
+			
+			System.out.println("percolaties?:  "+ newgrid.percolates());
+			
+			newgrid.open(0, 1);
+			System.out.println("opening (0, 1)");
+			newgrid.open(2, 3);
+			System.out.println("opening (2, 3)");
+			
+			System.out.println("is (1, 1) open?    " + newgrid.isOpen(1, 1));
+			
+			newgrid.open(1, 1);
+			System.out.println("opening (1, 1)");
+			newgrid.open(3, 2);
+			System.out.println("opening (3, 2)");
+			newgrid.open(3, 0);
+			System.out.println("opening (3, 0)");
+	
+
+			System.out.println("percolaties?:  "+ newgrid.percolates());
+			
+			System.out.println("is (3, 0) full?   " + newgrid.isFull(3, 0));
+			System.out.println("is (3, 2) full?   " + newgrid.isFull(3, 2));
+			
+			System.out.print("number of open sites is: " + newgrid.numberOfOpenSites());
+		}
+}

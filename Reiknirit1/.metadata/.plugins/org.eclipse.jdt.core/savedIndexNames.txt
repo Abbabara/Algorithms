@@ -1,0 +1,4 @@
+INDEX VERSION 1.131+/Users/arnbjorgfrimannsdottir/Documents/Documents - Arnbjörg’s MacBook Air/3. önn/Reiknirit/Reiknirit1/.metadata/.plugins/org.eclipse.jdt.core
+2064801972.index
+2843911306.index
+2114163203.index
